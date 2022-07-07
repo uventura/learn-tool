@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/uventura/learn-tool/issues"
   },
-  "homepage": "https://github.com/uventura/learn-tool#readme"
+  "homepage": "https://github.com/uventura/learn-tool#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
 }
