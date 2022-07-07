@@ -1,0 +1,23 @@
+{
+  "name": "learn-tool",
+  "version": "1.0.0",
+  "description": "Learning analytics tool for teachers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uventura/learn-tool.git"
+  },
+  "keywords": [
+    "learn",
+    "teach"
+  ],
+  "author": "uventura",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uventura/learn-tool/issues"
+  },
+  "homepage": "https://github.com/uventura/learn-tool#readme"
+}
