@@ -9,12 +9,17 @@ app.use(express.static('public'))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
+// Routes
+app.get('/', (req, res) => {
+  res.render('pages/home')
+})
+
 app.get('/signin', (req, res) => {
-  res.render('signin')
+  res.render('pages/signin')
 })
 
 app.get('/signup', (req, res) => {
-  res.render('signup')
+  res.render('pages/signup')
 })
 
 app.listen(port, () => {

@@ -1,0 +1,30 @@
+<%-include('../partials/header.ejs')%>
+  <%-include('../partials/navbar.ejs')%>
+
+<div class="container">
+  <div class="d-flex justify-content-center">
+    <div class="card" style="width: 26rem; margin-top: 3rem">
+      <div class="card-body">
+        <h2 class="card-title">Sign Up</h2>
+        <br>
+        <form>
+          <input type="text" placeholder="Name" class="form-control">
+          <br>
+          <input type="email" placeholder="Email" class="form-control">
+          <br>
+          <input type="password" placeholder="Password" class="form-control">
+          <br>
+          <input type="password" placeholder="Password Again" class="form-control">
+          <br>
+          <button class="btn btn-primary btn-lg btn-block">
+            Sign up
+          </button>
+          <br><br>
+          <a href="/signin">Sign In</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%-include('../partials/footer.ejs')%>
