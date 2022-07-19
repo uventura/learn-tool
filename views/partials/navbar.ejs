@@ -5,17 +5,24 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav me-auto mb-1 mb-lg-0">
         <li class="nav-item">
           <a class="nav-link text-white" aria-current="page" href="#">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" href="#">Groups</a>
+          <a class="nav-link text-white" href="#">Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/groups">Groups</a>
         </li>
       </ul>
-      <div class="d-flex" role="search">
+      <div class="d-flex">
         <a href="/new-group" class="btn btn-outline-light" type="submit">New Group</a>
       </div>
+      <form class="d-flex mt-2 mb-2" role="search">
+        <input type="text" class="form-control me-2 ms-2 bg-white text-dark" placeholder="Search">
+        <button class="btn btn-outline-primary"><i class="fa-solid fa-search"></i></button>
+      </form>
     </div>
   </div>
 </nav>

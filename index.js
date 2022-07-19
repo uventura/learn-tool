@@ -22,6 +22,10 @@ app.get('/signup', (req, res) => {
   res.render('pages/signup')
 })
 
+app.get('/groups', (req, res) => {
+  res.render('pages/groups')
+})
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
