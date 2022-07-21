@@ -1,0 +1,29 @@
+<%-include('../partials/header.ejs')%>
+
+<%-include('../partials/navbar.ejs')%>
+
+<div class="container">
+    <div class="d-flex justify-content-center">
+      <div class="card" style="width: 26rem; margin-top: 3rem">
+        <div class="card-body">
+          <h2 class="card-title">Your Profile <i class="fa-solid fa-user"></i></h2>
+          <br>
+          <form>
+            <input type="email" name="" id="" value="your-email@email.com" class="form-control" disabled>
+            <br>
+            <input type="text" value="Your Name" name="" id="" class="form-control">
+            <br>
+            <input type="text" value="Your Gender" name="" id="" class="form-control">
+            <br>
+            <button class="btn btn-primary btn-lg btn-block">
+                Update
+            </button>
+            <br><br>
+            <a href="/change-password">Change Password</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<%-include('../partials/footer.ejs')%>
