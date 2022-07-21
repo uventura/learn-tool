@@ -30,6 +30,10 @@ app.get('/profile', (req, res) => {
   res.render('pages/profile')
 })
 
+app.get('/change-password', (req, res) => {
+  res.render('pages/change-password')
+})
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
