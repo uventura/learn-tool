@@ -26,6 +26,10 @@ app.get('/groups', (req, res) => {
   res.render('pages/groups')
 })
 
+app.get('/new-group', (req, res) => {
+  res.render('pages/new-group')
+})
+
 app.get('/profile', (req, res) => {
   res.render('pages/profile')
 })
