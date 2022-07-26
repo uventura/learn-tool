@@ -42,6 +42,10 @@ app.get('/new-task', (req, res) => {
   res.render('pages/new-task')
 })
 
+app.get('/statistics', (req, res) => {
+  res.render('pages/statistics')
+})
+
 app.get('/search', (req, res) => {
   res.render('pages/search')
 })
