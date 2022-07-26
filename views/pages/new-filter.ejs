@@ -1,0 +1,57 @@
+<%-include('../partials/header.ejs')%>
+
+<%-include('../partials/navbar.ejs')%>
+
+<div class="container">
+    <div class="d-flex justify-content-center">
+      <div class="card" style="width: 26rem; margin-top: 1rem">
+        <div class="card-body">
+          <h2 class="card-title">New Filter <i class="fa-solid fa-filter"></i></h2>
+          <br>
+          <form>
+            <h5>Filter Name</h5>
+            <input type="text" name="" class="form-control" placeholder="Filter Name">
+            <br>
+            <h5>Filter Question</h5>
+            <textarea class="form-control" placeholder="Question applied to this filter"></textarea>
+            <br>
+            <h5>Filter Type:</h5>
+            <select id="filter-type" class="form-select" onchange="showSettings()">
+                <option value="string">String</option>
+                <option value="bool">Bool</option>
+                <option value="numeric">Numeric</option>
+                <option value="list">List Options</option>
+                <option value="range">Range</option>
+            </select>
+            <br>
+            <div style="display: none;" id="filter-setting">
+                <h6>Settings</h6>
+                <input type="text" class="form-control" name="" id="" placeholder="Type Here">
+                <br>
+            </div>
+            <button class="btn btn-primary btn-block">
+                Create Filter
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showSettings()
+    {
+        let type_selection = document.getElementById("filter-type");
+        let type_selection_value = type_selection.options[type_selection.selectedIndex].value
+        if(type_selection_value == "range" || type_selection_value == "list")
+        { 
+            document.getElementById("filter-setting").style.display = 'block';
+        }
+        else
+        {
+            document.getElementById("filter-setting").style.display = 'none';
+        }
+    }
+  </script>
+
+<%-include('../partials/footer.ejs')%>
