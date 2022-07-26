@@ -38,6 +38,10 @@ app.get('/new-filter', (req, res) => {
   res.render('pages/new-filter')
 })
 
+app.get('/new-task', (req, res) => {
+  res.render('pages/new-task')
+})
+
 app.get('/search', (req, res) => {
   res.render('pages/search')
 })
