@@ -30,6 +30,10 @@ app.get('/new-group', (req, res) => {
   res.render('pages/new-group')
 })
 
+app.get('/search', (req, res) => {
+  res.render('pages/search')
+})
+
 app.get('/profile', (req, res) => {
   res.render('pages/profile')
 })
