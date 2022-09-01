@@ -2,12 +2,24 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
 
+
 // Config
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
+
+// Connection
+const connection = require('./config/database.js')
+connection
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
 
 // Routes
 app.get('/', (req, res) => {
