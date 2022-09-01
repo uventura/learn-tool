@@ -21,6 +21,7 @@ connection
     console.error('Unable to connect to the database:', err);
   });
 
+
 // Routes
 app.get('/', (req, res) => {
   res.render('pages/home')
