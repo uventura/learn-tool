@@ -11,4 +11,3 @@ connection = new Sequelize(process.env.DATABASE_URL, {
 );
 
 module.exports = connection
-
