@@ -7,14 +7,22 @@
       <div class="card-body">
         <h2 class="card-title">Sign Up</h2>
         <br>
-        <form>
-          <input type="text" placeholder="Name" class="form-control">
+        <form action="/signup-creation" method="POST">
+          <input type="text" placeholder="Name"
+          class="form-control" name="name"
+          value="<%=newUserData.name%>">
           <br>
-          <input type="email" placeholder="Email" class="form-control">
+          <input type="email" placeholder="Email"
+          class="form-control" name="email"
+          value="<%=newUserData.email%>">
           <br>
-          <input type="password" placeholder="Password" class="form-control">
+          <input type="password" placeholder="Password"
+          class="form-control" name="passwordOne"
+          value="<%=newUserData.passwordOne%>">
           <br>
-          <input type="password" placeholder="Password Again" class="form-control">
+          <input type="password" placeholder="Password Again"
+          class="form-control" name="passwordTwo"
+          value="<%=newUserData.passwordTwo%>">
           <br>
           <button class="btn btn-primary btn-lg btn-block">
             Sign up
@@ -26,5 +34,9 @@
     </div>
   </div>
 </div>
+
+<%if(signupError){%>
+  <h1><%=signupError%></h1>
+<%}%>
 
 <%-include('../partials/footer.ejs')%>
