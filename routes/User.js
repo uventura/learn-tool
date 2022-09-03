@@ -36,11 +36,11 @@ UserRouter.get('/signup', userAuth.signinAuthNotLogged,(req, res) => {
     res.render('pages/signup', {signupError: signupError, newUserData:newUserData})
 })
 
-UserRouter.get('/signout', userAuth.signinAuthNotLogged, (req, res)=>{
+UserRouter.get('/signout', (req, res)=>{
     if(req.session.userLogged != undefined)
-        console.log("Sign Out clicked, bye :)")
         delete req.session.userLogged
     res.redirect('/')
+    return
 })
 
 //===================
