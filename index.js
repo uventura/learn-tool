@@ -31,16 +31,15 @@ app.use(session({
   cookie: {maxAge: 24 * 60 * 60 * 10000}
 }))
 
+// Middlewares
+const userAuth = require('./middlewares/signin.js')
+
 // Use Routes
 app.use('/',UserRoutes)
 
 // Routes(get)
-app.get('/', (req, res) => {
+app.get('/', userAuth.signinAuthNotLogged,(req, res) => {
   res.render('pages/home')
-})
-
-app.get('/signin', (req, res) => {
-  res.render('pages/signin')
 })
 
 app.get('/group', (req, res) => {

@@ -5,7 +5,49 @@ const UserRouter = express.Router()
 
 const bcrypt = require('bcrypt')
 
-UserRouter.post('/user/auth',(req, res)=>{
+const userAuth = require('../middlewares/signin.js')
+
+//===================
+//      GET
+//===================
+
+UserRouter.get('/signin', userAuth.signinAuthNotLogged, (req, res) => {
+    res.render('pages/signin')
+})
+
+UserRouter.get('/signup', userAuth.signinAuthNotLogged,(req, res) => {
+    const signupError = req.session.signupError != undefined ? req.session.signupError : false
+    const singupData = req.session.createUserDataError != undefined ? req.session.createUserDataError : false
+    
+    delete req.session.signupError
+    delete req.session.createUserDataError
+
+    let newUserData={
+        name:'',
+        username:'',
+        email:'',
+        passwordOne:'',
+        passwordTwo:''
+    }
+
+    if(singupData)
+        newUserData = singupData
+
+    res.render('pages/signup', {signupError: signupError, newUserData:newUserData})
+})
+
+UserRouter.get('/signout', userAuth.signinAuthNotLogged, (req, res)=>{
+    if(req.session.userLogged != undefined)
+        console.log("Sign Out clicked, bye :)")
+        delete req.session.userLogged
+    res.redirect('/')
+})
+
+//===================
+//      POST
+//===================
+
+UserRouter.post('/user/auth', userAuth.signinAuthNotLogged,(req, res)=>{
     const email = req.body.email
     const password = req.body.password
 
@@ -40,28 +82,7 @@ UserRouter.post('/user/auth',(req, res)=>{
     })
 })
 
-UserRouter.get('/signup', (req, res) => {
-    const signupError = req.session.signupError != undefined ? req.session.signupError : false
-    const singupData = req.session.createUserDataError != undefined ? req.session.createUserDataError : false
-    
-    delete req.session.signupError
-    delete req.session.createUserDataError
-
-    let newUserData={
-        name:'',
-        username:'',
-        email:'',
-        passwordOne:'',
-        passwordTwo:''
-    }
-
-    if(singupData)
-        newUserData = singupData
-
-    res.render('pages/signup', {signupError: signupError, newUserData:newUserData})
-})
-
-UserRouter.post('/signup-creation',(req,res)=>{
+UserRouter.post('/signup-creation', userAuth.signinAuthNotLogged,(req,res)=>{
     // All steps bellow can be abstracted with external functions
 
     const name = req.body.name
