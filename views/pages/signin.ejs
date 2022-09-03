@@ -7,10 +7,10 @@
           <div class="card-body">
             <h2 class="card-title">Sign In</h2>
             <br>
-            <form>
-              <input type="email" placeholder="Email" class="form-control">
+            <form action="/user/auth" method="POST">
+              <input type="email" placeholder="Email" class="form-control" name="email">
               <br>
-              <input type="password" placeholder="Password" class="form-control">
+              <input type="password" placeholder="Password" class="form-control" name="password">
               <br>
               <button class="btn btn-primary btn-lg btn-block">
                 Sign in

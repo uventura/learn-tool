@@ -5,6 +5,41 @@ const UserRouter = express.Router()
 
 const bcrypt = require('bcrypt')
 
+UserRouter.post('/user/auth',(req, res)=>{
+    const email = req.body.email
+    const password = req.body.password
+
+    User.findOne({
+        where:{
+            email:email
+        }
+    }).then((user)=>{
+        if(user != undefined){
+            const passwordIsEqual = bcrypt.compareSync(password, user.password)
+            console.log(passwordIsEqual)
+
+            if(passwordIsEqual){
+                req.session.userLogged = {
+                    id: user.id,
+                    name: user.name,
+                    email: email
+                }
+
+                res.redirect('/')
+            }else{
+                res.redirect('/signin')
+            }
+        }
+        else
+        {
+            res.redirect('/signin')
+        }
+    }).catch((error)=>{
+        console.log('[ERROR] User Authentication Failed.')
+        res.redirect('/signin')
+    })
+})
+
 UserRouter.get('/signup', (req, res) => {
     const signupError = req.session.signupError != undefined ? req.session.signupError : false
     const singupData = req.session.createUserDataError != undefined ? req.session.createUserDataError : false
