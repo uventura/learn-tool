@@ -1,5 +1,4 @@
 function signinAuthNotLogged(req, res, next){
-    console.log(req.session.userLogged)
     if(req.session.userLogged == undefined){
         next()
     }else{
