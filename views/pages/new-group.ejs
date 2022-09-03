@@ -7,14 +7,22 @@
       <div class="card" style="width: 26rem; margin-top: 3rem">
         <div class="card-body">
           <h2 class="card-title">New Group <i class="fa-solid fa-user-group"></i></h2>
-          <form action="/group">
-            <input type="text" placeholder="Group Name" name="" id="" class="form-control form-control-lg">
+          <form action="/new-group-create" method="POST">
+            <input type="text" placeholder="Group Name"
+            name="title" class="form-control form-control-lg"
+            value="<%=groupData.title%>">
             <br>
-            <textarea placeholder="Description (Optional)" class="form-control"></textarea>
+            <textarea placeholder="Description (Optional)" class="form-control"
+            name="description"><%=groupData.description%></textarea>
             <br>
-            <input type="password" name="" id="" class="form-control" placeholder="Password (Optional)">
+            <input type="password" name="passwordOne" class="form-control"
+            placeholder="Password (Optional)"
+            value="<%=groupData.passwordOne%>">
             <br>
-            <input type="password" name="" id="" class="form-control" placeholder="Password Again (Optional)">
+            <input type="password" name="passwordTwo"
+            class="form-control" placeholder="Password Again (Optional)"
+            value="<%=groupData.passwordTwo%>"
+            >
             <br>
             <button class="btn btn-primary btn-lg btn-block">
                 Create
@@ -25,5 +33,7 @@
       </div>
     </div>
   </div>
+
+  <h1><%=newGroupError%></h1>
 
 <%-include('../partials/footer.ejs')%>

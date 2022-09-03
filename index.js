@@ -13,9 +13,6 @@ connection
     console.error('Unable to connect to the database:', err);
   });
 
-// External Routes
-const UserRoutes = require('./routes/User.js')
-
 // Config
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({extended: false}))
@@ -34,36 +31,17 @@ app.use(session({
 // Middlewares
 const userAuth = require('./middlewares/signin.js')
 
+// External Routes
+const UserRoutes = require('./routes/User.js')
+const GroupRoutes = require('./routes/Group.js')
+
 // Use Routes
-app.use('/',UserRoutes)
+app.use('/', UserRoutes)
+app.use('/', GroupRoutes)
 
 // Routes(get)
 app.get('/', userAuth.signinAuthNotLogged,(req, res) => {
   res.render('pages/home')
-})
-
-app.get('/group', (req, res) => {
-  res.render('pages/group')
-})
-
-app.get('/groups', (req, res) => {
-  res.render('pages/groups')
-})
-
-app.get('/new-group', (req, res) => {
-  res.render('pages/new-group')
-})
-
-app.get('/new-filter', (req, res) => {
-  res.render('pages/new-filter')
-})
-
-app.get('/new-task', (req, res) => {
-  res.render('pages/new-task')
-})
-
-app.get('/statistics', (req, res) => {
-  res.render('pages/statistics')
 })
 
 app.get('/search', (req, res) => {
