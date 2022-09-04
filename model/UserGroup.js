@@ -9,7 +9,7 @@ UserGroup = connection.define('UserGroup', {});
 User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
 
-UserGroup.sync({force: true})
+UserGroup.sync({force: false})
     .then(()=>{
         console.log('[SUCCESS] User Group Relation Table Stablished.')
     })
