@@ -1,4 +1,5 @@
 const Group = require('../model/Group.js')
+const User = require('../model/User.js')
 const UserGroup = require('../model/UserGroup.js')
 
 const express = require('express')
@@ -12,12 +13,58 @@ const userAuth = require('../middlewares/signin.js')
 //      GET
 //===================
 
-GroupRouter.get('/group', userAuth.signinAuthLogged, (req, res) => {
-    res.render('pages/group')
+GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
+    const uri_title = req.params.title
+    const title = decodeURIComponent(uri_title).replaceAll('-', ' ')
+
+    Group.findOne({
+        where: {
+            title: title
+        },
+        raw:true,
+        attributes:['id', 'UserId','title'],
+    }).then(group => {
+        if(group != null)
+        {
+            let canEdit = false
+            if(req.session.userLogged.id == group.UserId)
+                canEdit = true
+            res.render('pages/group', {
+                canEdit: canEdit
+            })
+        }
+        else
+        {
+            res.redirect('/')
+        }
+    }).catch(error=>{
+        console.log('[ERROR] Group Route Failed.')
+        console.log(error)
+        res.redirect('/')
+    })
 })
   
 GroupRouter.get('/groups', userAuth.signinAuthLogged, (req, res) => {
-    res.render('pages/groups')
+    Group.findAll({
+        include : [
+            {
+                model: User,
+                required: true,
+                where: {
+                    id: req.session.userLogged['id']
+                }
+            }
+        ]
+    }).then(result => {
+        res.render('pages/groups', {
+            groups: result
+        })
+        return
+    }).catch(error => {
+        console.log('[ERROR] Group Select Error')
+        console.log(error)
+        return
+    })
 })
 
 GroupRouter.get('/new-group', userAuth.signinAuthLogged, (req, res) => {
@@ -31,7 +78,7 @@ GroupRouter.get('/new-group', userAuth.signinAuthLogged, (req, res) => {
         title:'',
         description:'',
         passwordOne:'',
-        passwordTwo:''
+        passwordTwo:'',
     }
 
     if(groupDataError)
@@ -136,7 +183,7 @@ GroupRouter.post('/new-group-create', userAuth.signinAuthLogged, (req, res) => {
             title:title,
             description:description,
             password:hash,
-            userId: creator_id
+            UserId: creator_id
         }).then((group_result)=>{
             UserGroup.create({
                 UserId: creator_id,

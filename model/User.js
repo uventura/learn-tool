@@ -1,7 +1,7 @@
 const connection = require('../config/database.js')
 const {Sequelize, DataTypes} = require('sequelize')
 
-const User = connection.define('Users', {
+const User = connection.define('User', {
     name: {
         type: DataTypes.STRING,
         allowNull: false
