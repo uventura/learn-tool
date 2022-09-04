@@ -17,7 +17,7 @@
     </form>
   <%}%>
   <%if(canEdit){%>
-    <a href="/new-task" class="btn btn-primary">New Task <i class="fa-solid fa-list-check"></i></a>
+    <a href="/new-task/<%=encode_title%>" class="btn btn-primary">New Task <i class="fa-solid fa-list-check"></i></a>
     <a href="/new-filter/<%=encode_title%>" class="btn btn-dark">New Filter <i class="fa-solid fa-filter"></i></a>
     <a href="/statistics" class="btn btn-secondary">Statistics <i class="fa-solid fa-chart-simple"></i></a>
   <%}%>

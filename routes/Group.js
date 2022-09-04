@@ -147,8 +147,35 @@ GroupRouter.get('/new-filter/:title', userAuth.signinAuthLogged, (req, res) => {
     })
 })
 
-GroupRouter.get('/new-task', userAuth.signinAuthLogged,(req, res) => {
-    res.render('pages/new-task')
+GroupRouter.get('/new-task/:title', userAuth.signinAuthLogged,(req, res) => {
+    const uri_title = req.params.title
+    const title = decodeURIComponent(uri_title).replaceAll('-', ' ')
+
+    Group.findOne({
+        where: {
+            title: title
+        }
+    }).then(result => {
+        Filter.findAll({
+            where: {
+                GroupId: result.id
+            }
+        }).then((result)=>{
+            res.render('pages/new-task',
+            {
+                filters: result,
+                back_uri_title: uri_title
+            })
+        }).catch(error=>{
+            console.log('[ERROR] New Task Find Filters Error')
+            console.log(error)
+            return
+        })
+    }).catch(error => {
+        console.log('[ERROR] New Task Find Group Error')
+        console.log(error)
+        res.redirect('/')
+    })
 })
 
 GroupRouter.get('/statistics', userAuth.signinAuthLogged, (req, res) => {
