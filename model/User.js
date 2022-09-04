@@ -16,7 +16,7 @@ const User = connection.define('User', {
     }
 });
 
-User.sync({force: false})
+User.sync({force: true})
     .then(()=>{
         console.log('[SUCCESS] User Table Stablished.')
     })

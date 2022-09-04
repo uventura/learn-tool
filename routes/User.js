@@ -142,8 +142,9 @@ UserRouter.post('/signup-creation', userAuth.signinAuthNotLogged,(req,res)=>{
             name:name,
             email:email,
             password:hash
-        }).then(()=>{
+        }).then((result)=>{
             req.session.userLogged = {
+                id: result.id,
                 name: name,
                 email: email
             }
