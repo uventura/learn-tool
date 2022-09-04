@@ -19,6 +19,7 @@ const Group = connection.define('Group', {
 });
 
 User.hasMany(Group);
+Group.belongsToMany(User, {through : 'UserGroup'});
 
 Group.sync({force: false})
     .then(()=>{

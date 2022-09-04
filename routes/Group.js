@@ -1,4 +1,5 @@
 const Group = require('../model/Group.js')
+const UserGroup = require('../model/UserGroup.js')
 
 const express = require('express')
 const GroupRouter = express.Router()
@@ -79,7 +80,15 @@ GroupRouter.post('/new-group-create', userAuth.signinAuthLogged, (req, res) => {
 
     req.session.createGroupDataError = groupData
 
-    // SIGN UP ERROR
+    // NOT EMPTY FIELDS
+    if( title.length < 5)
+    {
+        req.session.newGroupError = "Title Must Have 5 Characters"
+        res.redirect('/new-group')
+        return
+    }
+
+    // GROUP ERROR
     const titleRE = new RegExp('[^a-zA-Z 0-9]')
     const descriptionRE = new RegExp('[^a-zA-Z 0-9]')
     const passwordRE = new RegExp('[^a-zA-Z0-9]')
@@ -117,7 +126,7 @@ GroupRouter.post('/new-group-create', userAuth.signinAuthLogged, (req, res) => {
     }).catch(error=>{
         console.log('[INFO] Error in find similary Group.')
 
-        // SIGN UP IS VALID
+        // GROUP IS VALID
         delete req.session.createGroupDataError
 
         const salt = bcrypt.genSaltSync(10)
@@ -128,8 +137,19 @@ GroupRouter.post('/new-group-create', userAuth.signinAuthLogged, (req, res) => {
             description:description,
             password:hash,
             userId: creator_id
-        }).then(()=>{
-            res.redirect('/group')
+        }).then((group_result)=>{
+            UserGroup.create({
+                UserId: creator_id,
+                GroupId: group_result.dataValues.id
+            }).then(()=>{
+                res.redirect('/group')
+                return
+            }).catch((error)=>{
+                console.log('[ERROR] User Group Creation')
+                console.log(error)
+                res.redirect('/new-group')
+                return
+            })
         }).catch((error)=>{
             console.log('[ERROR] User Creation')
             console.log(error)
