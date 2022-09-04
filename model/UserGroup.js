@@ -4,7 +4,7 @@ const {Sequelize, DataTypes} = require('sequelize')
 const User = require('../model/User.js')
 const Group = require('../model/Group.js')
 
-UserGroup = connection.define('UserGroup', {});
+UserGroup = connection.define('UserGroup');
 
 User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
