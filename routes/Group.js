@@ -17,30 +17,50 @@ GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
     const uri_title = req.params.title
     const title = decodeURIComponent(uri_title).replaceAll('-', ' ')
 
-    Group.findOne({
+    UserGroup.findOne({
         where: {
-            title: title
-        },
-        raw:true,
-        attributes:['id', 'UserId','title'],
-    }).then(group => {
-        if(group != null)
-        {
-            let canEdit = false
-            if(req.session.userLogged.id == group.UserId)
-                canEdit = true
-            res.render('pages/group', {
-                canEdit: canEdit
-            })
+            UserId: req.session.userLogged.id
         }
-        else
-        {
+    }).then(result => {
+        let canJoin = true
+        if(result != null)
+            canJoin = false
+
+        Group.findOne({
+            where: {
+                title: title
+            },
+            raw:true,
+            attributes:['id', 'UserId','title'],
+        }).then(group => {
+            if(group != null)
+            {
+                let canEdit = false
+                if(req.session.userLogged.id == group.UserId)
+                    canEdit = true
+                res.render('pages/group', {
+                    canEdit: canEdit,
+                    canJoin: canJoin,
+                    title: group.title,
+                    id: group.id
+                })
+            }
+            else
+            {
+                res.redirect('/')
+                return
+            }
+        }).catch(error=>{
+            console.log('[ERROR] Group Route Failed.')
+            console.log(error)
             res.redirect('/')
-        }
-    }).catch(error=>{
-        console.log('[ERROR] Group Route Failed.')
+            return
+        })
+    }).catch(error => {
+        console.log('[ERROR] Group Error')
         console.log(error)
         res.redirect('/')
+        return
     })
 })
   
@@ -203,6 +223,42 @@ GroupRouter.post('/new-group-create', userAuth.signinAuthLogged, (req, res) => {
             res.redirect('/new-group')
             return
         })
+    })
+})
+
+GroupRouter.post('/join', userAuth.signinAuthLogged, (req, res) => {
+    const groupId = req.body.id
+    const title = req.body.title
+
+    UserGroup.findOne({
+        where: {
+            UserId: req.session.userLogged.id
+        }
+    }).then(groupRelation => {
+        if(groupRelation != null)
+        {
+            console.log("[ERROR] Join Isn't possible, relation already exists.")
+            res.redirect('/')
+            return
+        }
+        
+        UserGroup.create({
+            UserId: req.session.userLogged.id,
+            GroupId: groupId
+        }).then(()=>{
+            res.redirect('/group/'+title)
+            return
+        }).catch(error => {
+            console.log('[ERROR] Join Action Error')
+            console.log(error)
+            res.redirect('/')
+            return
+        })
+    }).catch(error => {
+        console.log('[ERROR] Join Action Error')
+        console.log(error)
+        res.redirect('/')
+        return
     })
 })
 
