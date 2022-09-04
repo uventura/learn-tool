@@ -8,25 +8,30 @@
         <div class="card-body">
           <h2 class="card-title">New Filter <i class="fa-solid fa-filter"></i></h2>
           <br>
-          <form>
+          <form action="/create-filter" method="POST">
+            <input type="hidden" name="group" value="<%=group%>">
+            <input type="hidden" name="group_uri" value="<%=group_uri%>">
             <h5>Filter Name</h5>
-            <input type="text" name="" class="form-control" placeholder="Filter Name">
+            <input type="text" name="title" class="form-control" placeholder="Filter Name" value="<%=filterData.title%>">
             <br>
             <h5>Filter Question</h5>
-            <textarea class="form-control" placeholder="Question applied to this filter"></textarea>
+            <textarea class="form-control" placeholder="Question applied to this filter" name="question"><%=filterData.question%></textarea>
             <br>
             <h5>Filter Type:</h5>
-            <select id="filter-type" class="form-select" onchange="showSettings()">
-                <option value="string">String</option>
-                <option value="bool">Bool</option>
-                <option value="numeric">Numeric</option>
-                <option value="list">List Options</option>
-                <option value="range">Range</option>
+            <select id="filter-type" class="form-select" onchange="showSettings()" name="type">
+                <%options = ["String", "Bool", "Numeric", "List", "Range"]%>
+                <%options.forEach(option=>{%>
+                  <%if(option.toLowerCase() == filterData.type){%>
+                    <option value="<%=option.toLowerCase()%>" selected><%=option%></option>
+                  <%}else{%>
+                    <option value="<%=option.toLowerCase()%>"><%=option%></option>
+                  <%}%>
+                <%})%>
             </select>
             <br>
             <div style="display: none;" id="filter-setting">
                 <h6>Settings</h6>
-                <input type="text" class="form-control" name="" id="" placeholder="Type Here">
+                <input type="text" class="form-control" name="setting" placeholder="Type Here" value="">
                 <br>
             </div>
             <button class="btn btn-primary btn-block">
@@ -37,6 +42,10 @@
       </div>
     </div>
   </div>
+
+  <h1>
+    <%=filter_error%>
+  </h1>
 
   <script>
     function showSettings()

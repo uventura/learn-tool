@@ -8,6 +8,7 @@ const GroupRouter = express.Router()
 const bcrypt = require('bcrypt')
 
 const userAuth = require('../middlewares/signin.js')
+const Filter = require('../model/Filter.js')
 
 //===================
 //      GET
@@ -111,8 +112,39 @@ GroupRouter.get('/new-group', userAuth.signinAuthLogged, (req, res) => {
     })
 })
 
-GroupRouter.get('/new-filter', userAuth.signinAuthLogged, (req, res) => {
-    res.render('pages/new-filter')
+GroupRouter.get('/new-filter/:title', userAuth.signinAuthLogged, (req, res) => {
+    const newFilterError = req.session.newFilterError != undefined ? req.session.newFilterError : ''
+    const filterData = req.session.filterData != undefined ? req.session.filterData : ''
+
+    delete req.session.newFilterError
+    delete req.session.filterData
+
+    const uri_title = req.params.title
+    const title = decodeURIComponent(uri_title).replaceAll('-', ' ')
+
+    Group.findOne({
+        where: {
+            title: title
+        },
+    }).then(result=>{
+        if(result == null)
+        {
+            res.redirect('/')
+            return
+        }
+
+        res.render('pages/new-filter', {
+            group: result.id,
+            group_uri: uri_title,
+            filter_error: newFilterError,
+            filterData: filterData
+        })
+        return
+    }).catch(error=>{
+        console.log('[ERROR] Filter Access')
+        console.log(error)
+        return
+    })
 })
 
 GroupRouter.get('/new-task', userAuth.signinAuthLogged,(req, res) => {
@@ -130,7 +162,7 @@ GroupRouter.get('/statistics', userAuth.signinAuthLogged, (req, res) => {
 GroupRouter.post('/new-group-create', userAuth.signinAuthLogged, (req, res) => {
     // All steps bellow can be abstracted with external functions
 
-    const title = req.body.title
+    const title = req.body.title.trim()
     const description = req.body.description
     const password1 = req.body.passwordOne
     const password2 = req.body.passwordTwo
@@ -258,6 +290,83 @@ GroupRouter.post('/join', userAuth.signinAuthLogged, (req, res) => {
         console.log('[ERROR] Join Action Error')
         console.log(error)
         res.redirect('/')
+        return
+    })
+})
+
+GroupRouter.post('/create-filter', userAuth.signinAuthLogged, (req, res) => {
+    const groupId = req.body.group
+    const groupURI = req.body.group_uri
+    const title = req.body.title.trim()
+    const question = req.body.question.trim()
+    const type = req.body.type.trim()
+    let setting = req.body.setting.trim()
+
+    const filter_data = {
+        group: groupId,
+        group_uri: groupURI,
+        title: title,
+        question: question,
+        type: type,
+        settings: setting
+    }
+
+    if(title.length < 5)
+    {
+        req.session.newFilterError = "Title must have at least 5 characters."
+        req.session.filterData = filter_data
+        res.redirect('/new-filter/'+groupURI)
+        return
+    }
+
+    // REGEX
+    const titleRE = new RegExp('[^a-zA-Z 0-9a-zA-ZãçáàóíéêÃÇÁÀÓÍÉÊ]')
+    const questionRE = new RegExp('[^a-z A-Z0-9ãçáàóíéêÃÇÁÀÓÍÉÊ,.?]')
+    const typeRE = new RegExp('[^a-zA-Z]')
+    const settingRE = new RegExp('[^a-zA-ZãçáàóíéêÃÇÁÀÓÍÉÊ,]')
+
+    if( titleRE.exec(title) != null
+    || questionRE.exec(question) != null
+    || typeRE.exec(type) != null)
+    {
+        req.session.newFilterError = "Some fields are wrong."
+        req.session.filterData = filter_data
+        res.redirect('/new-filter/'+groupURI)
+        return
+    }
+
+    if((type == "list" || type == "range") && setting.length == 0)
+    {
+        req.session.newFilterError = "Setting Cannot Be Empty"
+        req.session.filterData = filter_data
+        res.redirect('/new-filter/'+groupURI)
+        return
+    }
+
+    if(settingRE.exec(setting) != null)
+    {
+        req.session.newFilterError = "Setting Cannot Wit Wrong Values"
+        req.session.filterData = filter_data
+        res.redirect('/new-filter/'+groupURI)
+        return
+    }
+
+    setting = setting.replace(' ', '_').split(',').join(",")
+
+    Filter.create({
+        title:title,
+        question:question,
+        type:type,
+        settings: setting,
+        GroupId: groupId
+    }).then(()=>{
+        res.redirect('/group/'+groupURI)
+        return
+    }).catch((error)=>{
+        console.log('[ERROR] Filter Creation')
+        console.log(error)
+        req.session.filterData = filter_data
+        res.redirect('/new-filter/'+groupURI)
         return
     })
 })
