@@ -22,7 +22,13 @@
     <a href="/statistics" class="btn btn-secondary">Statistics <i class="fa-solid fa-chart-simple"></i></a>
   <%}%>
   <div class="list-group" style="margin-top: 1rem;">
-    <a href="#" class="list-group-item list-group-item-action">Task 01</a>
+    <%if(tasks_todo.length != 0){%>
+      <%tasks_todo.forEach(task=>{%>
+        <a href="#" class="list-group-item list-group-item-action"><%=task.title%></a>
+      <%})%>
+    <%}else{%>
+      <h1>No Tasks to do</h1>
+    <%}%>
   </div>
 </div>
 

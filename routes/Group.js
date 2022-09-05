@@ -1,9 +1,10 @@
+const Filter = require('../model/Filter.js')
+const FilterTask = require('../model/FilterTask.js')
 const Group = require('../model/Group.js')
+const Task = require('../model/Task.js')
 const User = require('../model/User.js')
 const UserGroup = require('../model/UserGroup.js')
-const Filter = require('../model/Filter.js')
-const Task = require('../model/Task.js')
-const FilterTask = require('../model/FilterTask.js')
+const UserTask = require('../model/UserTask.js')
 
 const express = require('express')
 const GroupRouter = express.Router()
@@ -11,6 +12,20 @@ const GroupRouter = express.Router()
 const bcrypt = require('bcrypt')
 
 const userAuth = require('../middlewares/signin.js')
+
+const { Op } = require("sequelize");
+
+//===================
+//     PROMISES
+//===================
+async function waitFindTasks(tasks)
+{
+    tasks_undo = []
+
+    
+
+    return tasks_undo
+}
 
 //===================
 //      GET
@@ -36,23 +51,71 @@ GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
             raw:true,
             attributes:['id', 'UserId','title'],
         }).then(group => {
-            if(group != null)
-            {
-                let canEdit = false
-                if(req.session.userLogged.id == group.UserId)
-                    canEdit = true
-                res.render('pages/group', {
-                    canEdit: canEdit,
-                    canJoin: canJoin,
-                    title: group.title,
-                    id: group.id
+            Task.findAll({
+                where: {
+                    GroupId: group.id
+                },
+                order: [
+                    ['title', 'DESC'],
+                ]
+            }).then(tasks=>{
+                let tasks_undo = []
+                let counter = 0
+
+                tasks.forEach(task => {
+                    UserTask.findAll({
+                        where: {
+                            TaskId: task.id,
+                            UserId: req.session.userLogged.id
+                        }
+                    }).then(result => {
+                        space = encodeURIComponent(' ')
+                        encode_title = encodeURIComponent(task.title)
+                        .replaceAll(space, '-')
+            
+                        
+                        if(result.length == 0)
+                        {
+                            tasks_undo.push({
+                                id: task.id,
+                                title: task.title,
+                                title_uri: encode_title,
+                            })
+                        }
+
+                        counter += 1
+                        if(counter >= tasks.length)
+                        {
+                            if(group != null)
+                            {
+                                let canEdit = false
+                                if(req.session.userLogged.id == group.UserId)
+                                    canEdit = true
+                                res.render('pages/group', {
+                                    canEdit: canEdit,
+                                    canJoin: canJoin,
+                                    title: group.title,
+                                    id: group.id,
+                                    tasks_todo: tasks_undo
+                                })
+                            }
+                            else
+                            {
+                                res.redirect('/')
+                                return
+                            }
+                        }
+                    }).catch(error => {
+                        console.log('[ERROR] User Tasks Error')
+                        console.log(error)
+                        return
+                    })
                 })
-            }
-            else
-            {
-                res.redirect('/')
+            }).catch(error=>{
+                console.log('[ERROR] Tasks Search')
+                console.log(error)
                 return
-            }
+            })
         }).catch(error=>{
             console.log('[ERROR] Group Route Failed.')
             console.log(error)
@@ -451,7 +514,6 @@ GroupRouter.post('/new-task-create', userAuth.signinAuthLogged, (req, res) => {
         })
         console.log('')
         res.redirect('/group/'+groupTitle)
-        return
     }).catch((error)=>{
         console.log('[ERROR] Task Creation')
         console.log(error)
