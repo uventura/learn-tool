@@ -1,6 +1,9 @@
 const Group = require('../model/Group.js')
 const User = require('../model/User.js')
 const UserGroup = require('../model/UserGroup.js')
+const Filter = require('../model/Filter.js')
+const Task = require('../model/Task.js')
+const FilterTask = require('../model/FilterTask.js')
 
 const express = require('express')
 const GroupRouter = express.Router()
@@ -8,7 +11,6 @@ const GroupRouter = express.Router()
 const bcrypt = require('bcrypt')
 
 const userAuth = require('../middlewares/signin.js')
-const Filter = require('../model/Filter.js')
 
 //===================
 //      GET
@@ -150,6 +152,9 @@ GroupRouter.get('/new-filter/:title', userAuth.signinAuthLogged, (req, res) => {
 GroupRouter.get('/new-task/:title', userAuth.signinAuthLogged,(req, res) => {
     const uri_title = req.params.title
     const title = decodeURIComponent(uri_title).replaceAll('-', ' ')
+    const newTaskError = req.session.newTaskError != undefined ? req.session.newTaskError : ''
+
+    delete req.session.newTaskError
 
     Group.findOne({
         where: {
@@ -160,11 +165,13 @@ GroupRouter.get('/new-task/:title', userAuth.signinAuthLogged,(req, res) => {
             where: {
                 GroupId: result.id
             }
-        }).then((result)=>{
+        }).then((result_filter)=>{
             res.render('pages/new-task',
             {
-                filters: result,
-                back_uri_title: uri_title
+                filters: result_filter,
+                back_uri_title: uri_title,
+                group_id: result.id,
+                taskError: newTaskError
             })
         }).catch(error=>{
             console.log('[ERROR] New Task Find Filters Error')
@@ -394,6 +401,61 @@ GroupRouter.post('/create-filter', userAuth.signinAuthLogged, (req, res) => {
         console.log(error)
         req.session.filterData = filter_data
         res.redirect('/new-filter/'+groupURI)
+        return
+    })
+})
+
+GroupRouter.post('/new-task-create', userAuth.signinAuthLogged, (req, res) => {
+    const title = req.body.title.trim()
+    const filters = req.body.filters
+    const groupId = req.body.group_id
+    const groupTitle = req.body.group_title
+
+    if(title.length < 5)
+    {
+        req.session.newTaskError = "Task Name must have at least 5 characters."
+        res.redirect('/new-task/'+groupTitle)
+        return
+    }
+
+    if(filters.length == 0)
+    {
+        req.session.newTaskError = "Select One Filter"
+        res.redirect('/new-task/'+groupTitle)
+        return
+    }
+
+    // REGEX
+    const titleRE = new RegExp('[^a-zA-Z 0-9a-zA-ZãçáàóíéêÃÇÁÀÓÍÉÊ]')
+    if(titleRE.exec(title) != null)
+    {
+        req.session.newTaskError = "Wrong Task Name"
+        res.redirect('/new-task/'+groupTitle)
+    }
+
+    Task.create({
+        title:title,
+        GroupId: groupId
+    }).then((result)=>{
+        filters.forEach(filter => {
+            FilterTask.create({
+                FilterId: parseInt(filter),
+                TaskId: parseInt(result.id)
+            }).then(()=>{
+                console.log('[SUCCES] Task Filter Creation Completed!')
+            }).catch(error=>{
+                console.log('[ERROR] Task Filter Creation')
+                console.log(error)
+                return
+            })
+        })
+        console.log('')
+        res.redirect('/group/'+groupTitle)
+        return
+    }).catch((error)=>{
+        console.log('[ERROR] Task Creation')
+        console.log(error)
+        res.redirect('/new-task/'+groupTitle)
         return
     })
 })

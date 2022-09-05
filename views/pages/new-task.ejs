@@ -7,14 +7,16 @@
       <div class="card" style="width: 26rem; margin-top: 3rem">
         <div class="card-body">
           <h2 class="card-title"><i class="fa-solid fa-list-check"></i> New Task</h2>
-          <form action="/group">
+          <form action="/new-task-create" method="POST">
+            <input type="hidden" name="group_id" value="<%=group_id%>">
+            <input type="hidden" name="group_title" value="<%=back_uri_title%>">
             <br>
-            <input type="text" placeholder="Task Name" name="" id="" class="form-control form-control-lg">
+            <input type="text" placeholder="Task Name" name="title" id="" class="form-control form-control-lg">
             <br>
             <%id = 1%>
             <%filters.forEach(filter => {%>
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault<%=id%>">
+                <input class="form-check-input" type="checkbox" value="<%=filter.id%>" id="flexCheckDefault<%=id%>" name="filters">
                 <label class="form-check-label" for="flexCheckDefault<%=id%>">
                   <%=filter.title%>
                 </label>
@@ -22,9 +24,9 @@
               <%id+=1%>
             <%})%>
             <br>
-            <a href="" class="btn btn-primary btn-block">
+            <button class="btn btn-primary btn-block">
                 Create New Task
-            </a>
+            </button>
             <br><br>
             <a href="../group/<%=back_uri_title%>">Back</a>
             <br>
@@ -33,5 +35,7 @@
       </div>
     </div>
   </div>
+
+  <h1><%=taskError%></h1>
 
 <%-include('../partials/footer.ejs')%>
