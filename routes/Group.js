@@ -16,18 +16,6 @@ const userAuth = require('../middlewares/signin.js')
 const { Op } = require("sequelize");
 
 //===================
-//     PROMISES
-//===================
-async function waitFindTasks(tasks)
-{
-    tasks_undo = []
-
-    
-
-    return tasks_undo
-}
-
-//===================
 //      GET
 //===================
 
@@ -252,6 +240,75 @@ GroupRouter.get('/statistics', userAuth.signinAuthLogged, (req, res) => {
     res.render('pages/statistics')
 })
 
+GroupRouter.get('/task/:title/:task_id', userAuth.signinAuthLogged, (req, res) => {
+    const uri_title = req.params.title
+    const title = decodeURIComponent(uri_title).replaceAll('-', ' ')
+
+    const task_id = parseInt(req.params.task_id)-42
+
+    Group.findOne({
+        where: {
+            title: title
+        },
+    }).then(result=>{
+        counter = 0
+        FilterTask.findAll({
+            where:{
+                TaskId: task_id
+            },
+        }).then((founded_tasks)=>{
+            filters = []
+            founded_tasks.forEach(filter_task=>{
+                Filter.findOne({
+                    where: {
+                        id: filter_task.FilterId
+                    }
+                }).then(result=>{
+                    filters.push({
+                        id: result.id,
+                        type: result.type,
+                        settings: result.settings,
+                        question: result.question,
+                        group_id: result.GroupId
+                    })
+
+                    counter += 1
+
+                    if(counter >= founded_tasks.length)
+                    {
+                        Task.findOne({
+                            where:{
+                                id: task_id
+                            }
+                        }).then((task_result)=>{
+                            res.render('pages/task', {
+                                filters: filters,
+                                title: task_result.title
+                            })
+                        }).catch(error=>{
+                            console.log('[ERRO] Task Search Error')
+                            console.log(error)
+                            return
+                        })
+                    }
+                }).catch(error=>{
+                    console.log('[ERROR] Filter Task Search Error')
+                    console.log(error)
+                    return
+                })
+            })
+        }).catch(error => {
+            console.log("[ERROR] Couldn't find task")
+            console.log(error)
+            return
+        })
+    }).catch(error=>{
+        console.log('[ERROR] Group not Found')
+        console.log(error)
+        return
+    })
+})
+
 //===================
 //      POST
 //===================
@@ -420,7 +477,7 @@ GroupRouter.post('/create-filter', userAuth.signinAuthLogged, (req, res) => {
     const titleRE = new RegExp('[^a-zA-Z 0-9a-zA-ZãçáàóíéêÃÇÁÀÓÍÉÊ]')
     const questionRE = new RegExp('[^a-z A-Z0-9ãçáàóíéêÃÇÁÀÓÍÉÊ,.?]')
     const typeRE = new RegExp('[^a-zA-Z]')
-    const settingRE = new RegExp('[^a-zA-ZãçáàóíéêÃÇÁÀÓÍÉÊ,]')
+    const settingRE = new RegExp('[^a-zA-ZãçáàóíéêÃÇÁÀÓÍÉÊ,0-9-]')
 
     if( titleRE.exec(title) != null
     || questionRE.exec(question) != null
@@ -496,6 +553,7 @@ GroupRouter.post('/new-task-create', userAuth.signinAuthLogged, (req, res) => {
         res.redirect('/new-task/'+groupTitle)
     }
 
+    counter = 0
     Task.create({
         title:title,
         GroupId: groupId
@@ -506,14 +564,18 @@ GroupRouter.post('/new-task-create', userAuth.signinAuthLogged, (req, res) => {
                 TaskId: parseInt(result.id)
             }).then(()=>{
                 console.log('[SUCCES] Task Filter Creation Completed!')
+                counter += 1
+                if(counter >= filters.length)
+                {
+                    res.redirect('/group/'+groupTitle)
+                    return
+                }
             }).catch(error=>{
                 console.log('[ERROR] Task Filter Creation')
                 console.log(error)
                 return
             })
         })
-        console.log('')
-        res.redirect('/group/'+groupTitle)
     }).catch((error)=>{
         console.log('[ERROR] Task Creation')
         console.log(error)

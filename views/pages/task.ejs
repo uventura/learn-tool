@@ -1,0 +1,46 @@
+<%-include('../partials/header.ejs')%>
+
+<%-include('../partials/navbar.ejs')%>
+
+<div class="container">
+    <div class="d-flex justify-content-center">
+      <div class="card" style="width: 40rem; margin-top: 1rem">
+        <div class="card-body">
+          <h2 class="card-title"><i class="fa-solid fa-list-check"></i> <%=title%></h2>
+          <br>
+          <form action="/create-filter" method="POST">
+            <%filters.forEach(filter=>{%>
+                <h4><%=filter.question%></h4>
+                <%filter_name = filter.type+filter.id%>
+                <%if(filter.type == "string"){%>
+                    <textarea name="<%=filter_name%>" class="form-control"></textarea>
+                <%}else if(filter.type == "bool"){%>
+                    <select class="form-select" name="<%=filter_name%>">
+                        <option value="true">True</option> 
+                        <option value="false">False</option>
+                    </select>
+                <%}else if(filter.type == "numeric"){%>
+                    <input type="number" name="<%=filter_name%>">
+                <%}else if(filter.type == "range"){%>
+                    <label for="customRange" class="form-label">Range</label>
+                    <input type="range" class="form-range" min="<%=filter.settings.split(',')[0]%>" max="<%=filter.settings.split(',')[1]%>" id="customRange"
+                    name="<%=filter_name%>">
+                <%}else if(filter.type == "list"){%>
+                    <select class="form-select" name="<%=filter_name%>">
+                        <%filter.settings.split(',').forEach(setting=>{%>
+                            <option value="<%=setting%>"><%=setting%></option>
+                        <%})%>
+                    </select>
+                <%}%>
+                <br>
+            <%})%>
+            <button class="btn btn-primary btn-block">
+                Submit
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<%-include('../partials/footer.ejs')%>

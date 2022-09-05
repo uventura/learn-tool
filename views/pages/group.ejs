@@ -24,7 +24,7 @@
   <div class="list-group" style="margin-top: 1rem;">
     <%if(tasks_todo.length != 0){%>
       <%tasks_todo.forEach(task=>{%>
-        <a href="#" class="list-group-item list-group-item-action"><%=task.title%></a>
+        <a href="/task/<%=encode_title%>/<%=task.id+42%>" class="list-group-item list-group-item-action"><%=task.title%></a>
       <%})%>
     <%}else{%>
       <h1>No Tasks to do</h1>
