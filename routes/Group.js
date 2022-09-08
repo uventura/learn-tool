@@ -473,6 +473,14 @@ GroupRouter.post('/create-filter', userAuth.signinAuthLogged, (req, res) => {
         return
     }
 
+    if(question.length < 10)
+    {
+        req.session.newFilterError = "Question must have at least 10 characters."
+        req.session.filterData = filter_data
+        res.redirect('/new-filter/'+groupURI)
+        return
+    }
+
     // REGEX
     const titleRE = new RegExp('[^a-zA-Z 0-9a-zA-ZãçáàóíéêÃÇÁÀÓÍÉÊ]')
     const questionRE = new RegExp('[^a-z A-Z0-9ãçáàóíéêÃÇÁÀÓÍÉÊ,.?]')

@@ -22,8 +22,12 @@
                 <%}else if(filter.type == "numeric"){%>
                     <input type="number" name="<%=filter_name%>">
                 <%}else if(filter.type == "range"){%>
-                    <label for="customRange" class="form-label">Range</label>
-                    <input type="range" class="form-range" min="<%=filter.settings.split(',')[0]%>" max="<%=filter.settings.split(',')[1]%>" id="customRange"
+                    <label for="customRange" class="form-label" id="rangeValue">0</label>
+                    <input type="range" class="form-range"
+                    min="<%=filter.settings.split(',')[0]%>"
+                    max="<%=filter.settings.split(',')[1]%>"
+                    id="customRange"
+                    onchange="updateRangeInput(this.value);"
                     name="<%=filter_name%>">
                 <%}else if(filter.type == "list"){%>
                     <select class="form-select" name="<%=filter_name%>">
@@ -42,5 +46,11 @@
       </div>
     </div>
   </div>
+
+  <script>
+    function updateRangeInput(val) {
+          document.getElementById('rangeValue').innerHTML=val; 
+        }
+  </script>
 
 <%-include('../partials/footer.ejs')%>
