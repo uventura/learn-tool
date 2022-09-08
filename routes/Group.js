@@ -258,6 +258,9 @@ GroupRouter.get('/task/:title/:task_id', userAuth.signinAuthLogged, (req, res) =
     const title = decodeURIComponent(uri_title).replaceAll('-', ' ')
 
     const task_id = parseInt(req.params.task_id)-42
+    const taskError = req.session.taskError != undefined ? req.session.taskError : ''
+
+    delete req.session.taskError
 
     Group.findOne({
         where: {
@@ -298,7 +301,8 @@ GroupRouter.get('/task/:title/:task_id', userAuth.signinAuthLogged, (req, res) =
                                 filters: filters,
                                 title: task_result.title,
                                 uri_title: uri_title,
-                                uri_id: req.params.task_id
+                                uri_id: req.params.task_id,
+                                error: taskError
                             })
                             return
                         }).catch(error=>{
@@ -627,6 +631,7 @@ GroupRouter.post('/create-task', userAuth.signinAuthLogged, (req, res) => {
     answered_fields.forEach(answer=>{
         if(req.body[answer] == undefined || req.body[answer] == '')
         {
+            req.session.taskError = "All fields must be filled."
             res.redirect('/task/'+uri_title+'/'+uri_id);
             return
         }
