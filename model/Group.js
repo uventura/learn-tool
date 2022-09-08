@@ -3,7 +3,7 @@ const {Sequelize, DataTypes} = require('sequelize')
 
 const User = require('../model/User.js')
 
-const Group = connection.define('Group', {
+const Group = connection.define('Groups', {
     title: {
         type: DataTypes.STRING,
         allowNull: false
