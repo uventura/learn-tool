@@ -16,7 +16,9 @@ const User = connection.define('User', {
     }
 });
 
-User.sync({force: false})
+reset = require('../model/Base.js')
+
+User.sync({force: reset})
     .then(()=>{
         console.log('[SUCCESS] User Table Stablished.')
     })

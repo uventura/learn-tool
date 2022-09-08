@@ -9,7 +9,9 @@ FilterTask = connection.define('FilterTask');
 Task.belongsToMany(Filter, { through: FilterTask });
 Filter.belongsToMany(Task, { through: FilterTask });
 
-FilterTask.sync({force: false})
+reset = require('../model/Base.js')
+
+FilterTask.sync({force: reset})
     .then(()=>{
         console.log('[SUCCESS] Filter Task Relation Table Stablished.')
     })

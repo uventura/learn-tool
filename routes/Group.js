@@ -20,6 +20,8 @@ const { Op } = require("sequelize");
 //===================
 
 GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
+    console.log('Fine!')
+
     const uri_title = req.params.title
     const title = decodeURIComponent(uri_title).replaceAll('-', ' ')
 
@@ -44,7 +46,7 @@ GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
                     GroupId: group.id
                 },
                 order: [
-                    ['title', 'DESC'],
+                    ['id', 'DESC'],
                 ]
             }).then(tasks=>{
                 let tasks_undo = []
@@ -70,7 +72,7 @@ GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
                                 title_uri: encode_title,
                             })
                         }
-
+    
                         counter += 1
                         if(counter >= tasks.length)
                         {
@@ -86,6 +88,7 @@ GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
                                     id: group.id,
                                     tasks_todo: tasks_undo
                                 })
+                                return
                             }
                             else
                             {
@@ -99,8 +102,20 @@ GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
                         return
                     })
                 })
+
+                if(tasks.length == 0)
+                {
+                    res.render('pages/group', {
+                        canEdit: req.session.userLogged.id == group.UserId,
+                        canJoin: canJoin,
+                        title: group.title,
+                        id: group.id,
+                        tasks_todo: []
+                    })
+                    return
+                }
             }).catch(error=>{
-                console.log('[ERROR] Tasks Search')
+                console.log('[ERROR] Task Route Error.')
                 console.log(error)
                 return
             })
@@ -566,14 +581,18 @@ GroupRouter.post('/new-task-create', userAuth.signinAuthLogged, (req, res) => {
         title:title,
         GroupId: groupId
     }).then((result)=>{
-        filters.forEach(filter => {
+        let filters_cast = filters
+        if(typeof filters == "string")
+            filters_cast = [filters]
+            
+        filters_cast.forEach(filter => {
             FilterTask.create({
                 FilterId: parseInt(filter),
                 TaskId: parseInt(result.id)
             }).then(()=>{
                 console.log('[SUCCES] Task Filter Creation Completed!')
                 counter += 1
-                if(counter >= filters.length)
+                if(counter >= filters_cast.length)
                 {
                     res.redirect('/group/'+groupTitle)
                     return

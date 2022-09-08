@@ -24,7 +24,9 @@ const Filter = connection.define('Filter', {
 
 Group.hasMany(Filter);
 
-Filter.sync({force: false})
+reset = require('../model/Base.js')
+
+Filter.sync({force: reset})
     .then(()=>{
         console.log('[SUCCESS] Filter Table Stablished.')
     })

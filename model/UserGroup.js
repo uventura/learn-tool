@@ -9,7 +9,9 @@ UserGroup = connection.define('UserGroup');
 User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
 
-UserGroup.sync({force: false})
+reset = require('../model/Base.js')
+
+UserGroup.sync({force: reset})
     .then(()=>{
         console.log('[SUCCESS] User Group Relation Table Stablished.')
     })

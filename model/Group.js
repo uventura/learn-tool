@@ -20,7 +20,9 @@ const Group = connection.define('Group', {
 
 User.hasMany(Group);
 
-Group.sync({force: false})
+reset = require('../model/Base.js')
+
+Group.sync({force: reset})
     .then(()=>{
         console.log('[SUCCESS] Group Table Stablished.')
     })

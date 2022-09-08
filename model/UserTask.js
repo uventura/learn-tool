@@ -19,7 +19,9 @@ UserTask = connection.define('UserTask', {
 User.belongsToMany(Task, { through: UserTask })
 Task.belongsToMany(User, { through: UserTask })
 
-UserTask.sync({force: false})
+reset = require('../model/Base.js')
+
+UserTask.sync({force: reset})
     .then(()=>{
         console.log('[SUCCESS] User Task Relation Table Stablished.')
     })

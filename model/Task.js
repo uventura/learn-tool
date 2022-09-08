@@ -12,7 +12,9 @@ const Task = connection.define('Task', {
 
 Group.hasMany(Task);
 
-Task.sync({force: false})
+reset = require('../model/Base.js')
+
+Task.sync({force: reset})
     .then(()=>{
         console.log('[SUCCESS] Task Table Stablished.')
     })
