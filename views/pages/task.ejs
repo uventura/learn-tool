@@ -8,7 +8,7 @@
         <div class="card-body">
           <h2 class="card-title"><i class="fa-solid fa-list-check"></i> <%=title%></h2>
           <br>
-          <form action="/create-filter" method="POST">
+          <form action="/create-task" method="POST">
             <%filters.forEach(filter=>{%>
                 <h4><%=filter.question%></h4>
                 <%filter_name = filter.type+filter.id%>
@@ -38,6 +38,8 @@
                 <%}%>
                 <br>
             <%})%>
+            <input type="hidden" value="<%=uri_title%>" name="uri_title">
+            <input type="hidden" value="<%=uri_id%>" name="uri_id">
             <button class="btn btn-primary btn-block">
                 Submit
             </button>

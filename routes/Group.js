@@ -20,8 +20,6 @@ const { Op } = require("sequelize");
 //===================
 
 GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
-    console.log('Fine!')
-
     const uri_title = req.params.title
     const title = decodeURIComponent(uri_title).replaceAll('-', ' ')
 
@@ -298,8 +296,11 @@ GroupRouter.get('/task/:title/:task_id', userAuth.signinAuthLogged, (req, res) =
                         }).then((task_result)=>{
                             res.render('pages/task', {
                                 filters: filters,
-                                title: task_result.title
+                                title: task_result.title,
+                                uri_title: uri_title,
+                                uri_id: req.params.task_id
                             })
+                            return
                         }).catch(error=>{
                             console.log('[ERRO] Task Search Error')
                             console.log(error)
@@ -561,6 +562,13 @@ GroupRouter.post('/new-task-create', userAuth.signinAuthLogged, (req, res) => {
         return
     }
 
+    if(filters == undefined)
+    {
+        req.session.newTaskError = "You must create filters."
+        res.redirect('/new-task/'+groupTitle)
+        return
+    }
+
     if(filters.length == 0)
     {
         req.session.newTaskError = "Select One Filter"
@@ -608,6 +616,20 @@ GroupRouter.post('/new-task-create', userAuth.signinAuthLogged, (req, res) => {
         console.log(error)
         res.redirect('/new-task/'+groupTitle)
         return
+    })
+})
+
+GroupRouter.post('/create-task', userAuth.signinAuthLogged, (req, res) => {
+    let answered_fields = Object.keys(req.body)
+    const uri_title = req.body.uri_title
+    const uri_id = req.body.uri_id
+
+    answered_fields.forEach(answer=>{
+        if(req.body[answer] == undefined || req.body[answer] == '')
+        {
+            res.redirect('/task/'+uri_title+'/'+uri_id);
+            return
+        }
     })
 })
 
