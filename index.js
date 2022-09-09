@@ -64,3 +64,8 @@ app.listen(port, () => {
 app.get('/signup', (req, res) => {
   res.render('signup')
 })
+
+// 404 ERROR
+app.use(function (req, res) {
+  res.status(404).render('pages/404');
+});
