@@ -140,7 +140,10 @@ GroupRouter.get('/groups', userAuth.signinAuthLogged, (req, res) => {
                 required: true,
                 where: {
                     id: req.session.userLogged['id']
-                }
+                },
+                order: [
+                    ['id', 'DESC'],
+                ]
             }
         ]
     }).then(result => {
