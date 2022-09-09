@@ -416,7 +416,10 @@ GroupRouter.post('/new-group-create', userAuth.signinAuthLogged, (req, res) => {
                 UserId: creator_id,
                 GroupId: group_result.dataValues.id
             }).then(()=>{
-                res.redirect('/group')
+                space = encodeURIComponent(' ')
+                encode_title = encodeURIComponent(title)
+                .replaceAll(space, '-')
+                res.redirect('/group/'+encode_title)
                 return
             }).catch((error)=>{
                 console.log('[ERROR] User Group Creation')
