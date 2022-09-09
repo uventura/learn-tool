@@ -34,18 +34,16 @@ const userAuth = require('./middlewares/signin.js')
 // External Routes
 const UserRoutes = require('./routes/User.js')
 const GroupRoutes = require('./routes/Group.js')
+const SearchRoutes = require('./routes/Search.js')
 
 // Use Routes
 app.use('/', UserRoutes)
 app.use('/', GroupRoutes)
+app.use('/', SearchRoutes)
 
 // Routes(get)
 app.get('/', userAuth.signinAuthNotLogged,(req, res) => {
   res.render('pages/home')
-})
-
-app.get('/search', (req, res) => {
-  res.render('pages/search')
 })
 
 app.get('/profile', (req, res) => {
