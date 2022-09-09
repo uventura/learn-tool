@@ -5,16 +5,7 @@ const FilterTask = require('../model/FilterTask')
 const User = require('../model/User.js');
 const Task = require('./Task.js');
 
-UserTask = connection.define('UserTask', {
-    type: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    answer: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-});
+UserTask = connection.define('UserTask');
 
 User.belongsToMany(Task, { through: UserTask })
 Task.belongsToMany(User, { through: UserTask })

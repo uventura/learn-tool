@@ -3,6 +3,7 @@ const FilterTask = require('../model/FilterTask.js')
 const Group = require('../model/Group.js')
 const Task = require('../model/Task.js')
 const User = require('../model/User.js')
+const UserFilter = require('../model/UserFilter.js')
 const UserGroup = require('../model/UserGroup.js')
 const UserTask = require('../model/UserTask.js')
 
@@ -628,6 +629,8 @@ GroupRouter.post('/create-task', userAuth.signinAuthLogged, (req, res) => {
     const uri_title = req.body.uri_title
     const uri_id = req.body.uri_id
 
+    let type_id = {}
+
     answered_fields.forEach(answer=>{
         if(req.body[answer] == undefined || req.body[answer] == '')
         {
@@ -635,6 +638,45 @@ GroupRouter.post('/create-task', userAuth.signinAuthLogged, (req, res) => {
             res.redirect('/task/'+uri_title+'/'+uri_id);
             return
         }
+
+        let types = ["bool", "numeric", "list", "range", "string"]
+        types.forEach(type => {
+            if(answer.indexOf(String(type)) > -1)
+            {
+                type_id[answer] = [type, answer.split(type)[1]]
+            }
+        })
+    })
+
+    counter = 0
+    Object.values(type_id).forEach(data => {
+        UserFilter.create({
+            type: data[0],
+            answer: req.body[data[0]+String(data[1])],
+            FilterId: parseInt(data[1]),
+            UserId: parseInt(req.session.userLogged.id),
+            TaskId: parseInt(parseInt(uri_id)-42)
+        }).then(result=>{
+            counter += 1
+            if(counter >= answered_fields.length - 2)
+            {
+                UserTask.create({
+                    UserId: parseInt(req.session.userLogged.id),
+                    TaskId: parseInt(uri_id)-42
+                }).then(task_result=>{
+                    res.redirect('/group/'+uri_title);
+                    return
+                }).catch(error=>{
+                    console.log('[ERROR] User Task Answer not registered.')
+                    console.log(error)
+                    return
+                })
+            }
+        }).catch(error=>{
+            console.log('[ERROR] Task Answer not registered')
+            console.log(error)
+            return
+        })
     })
 })
 
