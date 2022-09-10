@@ -19,7 +19,7 @@
   <%if(canEdit){%>
     <a href="/new-task/<%=encode_title%>" class="btn btn-primary">New Task <i class="fa-solid fa-list-check"></i></a>
     <a href="/new-filter/<%=encode_title%>" class="btn btn-dark">New Filter <i class="fa-solid fa-filter"></i></a>
-    <a href="/statistics" class="btn btn-secondary">Statistics <i class="fa-solid fa-chart-simple"></i></a>
+    <a href="/statistics/<%=encode_title%>" class="btn btn-secondary">Statistics <i class="fa-solid fa-chart-simple"></i></a>
   <%}%>
   <div class="list-group" style="margin-top: 1rem;">
     <%if(tasks_todo.length != 0){%>

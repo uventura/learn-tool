@@ -2,7 +2,136 @@
 
 <%-include('../partials/navbar.ejs')%>
 
-<div class="container card">
+<style>
+    canvas{
+        background-color: #fff;
+        border-radius: 0.2rem;
+        border: 2px solid #eee;
+    }
+
+    .chart-container-circle {
+        position: relative;
+        height: 30vh;
+        width: 30vw;
+    }
+    .chart-container-line {
+        position: relative;
+        height: 50vh;
+        width: 50vw;
+    }
+</style>
+
+<div class="container" style="margin-top:1.5rem;width: 50rem;">
+    <h1 style="margin-bottom:0.5rem;"><i class="fa-solid fa-chart-simple"></i> Statistics</h1>
+    <form action="/get-task" method="POST">
+        <%if(task_level == "not_selected"){%>
+            <h3>Tasks</h3>
+            <select class="form-select md-3" name="task">
+                <%tasks.forEach(task=>{%>
+                    <option value="<%=task.id%>"><%=task.title%></option> 
+                <%})%>
+            </select>
+            <input type="hidden" name="process" value="not_selected">
+            <br>
+            <button class="btn btn-primary">Get Filters</button>
+        <%}else if(task_level == "filters"){%>
+            <h3>Filters</h3>
+            <select class="form-select md-3" name="filter">
+                <%filters.forEach(filter=>{%>
+                    <option value="<%=filter.id%>"><%=filter.title%></option> 
+                <%})%>
+            </select>
+            <input type="hidden" name="process" value="filters">
+            <br>
+            <button class="btn btn-primary">Plot</button>
+        <%}else if(task_level == "data"){%>
+            <%
+                css_class=""
+                if(type == 'bool' || type == 'list'){
+                    css_class="chart-container-circle"
+                }else if(type == 'range' || type == 'numeric'){
+                    css_class="chart-container-line"
+                }
+            %>
+            <%if(type != 'string'){%>
+            <div class="<%=css_class%>">
+                <canvas id="myChart"></canvas>
+            </div>
+            <%}else{%>
+                <h1>Not Implemented Yet</h1>
+            <%}%>
+            <br style="margin-top: 4rem;">
+        <%}%>
+    </form>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    <%if(task_level == "data"){%>
+        answers_k = []
+        <%answers_keys.forEach(key => {%>
+        answers_k.push("<%=key%>")
+        <%});%>
+
+        answers_v = []
+        <%answers_values.forEach(value=>{%>
+        answers_v.push(parseInt("<%=value%>"))
+        <%})%>
+
+        answers_c = []
+        <%answers_color.forEach(color=>{%>
+        answers_c.push("<%=color%>")
+        <%})%>
+
+        <%if(type == "bool" || type == "list"){%>
+        const data = {
+        labels: answers_k,
+        datasets: [{
+            label: 'Results',
+            data: answers_v,
+            backgroundColor: answers_c,
+            hoverOffset: 4
+        }]
+        };
+    
+        const config = {
+        type: 'doughnut',
+        data: data,
+        options: {
+            radius: '100%',
+            responsive: true,
+        }
+        };
+        <%}else if(type == "range" || type == "numeric"){%>
+        for(i=0;i<answers_k.length;++i)
+        {
+            answers_k[i]=parseInt(answers_k[i])
+        }
+
+        const labels = answers_k;
+        const data = {
+        labels: labels,
+        datasets: [{
+            label: 'Results',
+            data: answers_v,
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }]
+        };
+
+        const config = {
+        type: 'line',
+        data: data,
+        options: {
+            responsive: true,
+        }
+        };
+        <%}%>
+        const myChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+    <%}%>
+</script>
 <%-include('../partials/footer.ejs')%>

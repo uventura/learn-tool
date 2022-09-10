@@ -15,6 +15,7 @@ const bcrypt = require('bcrypt')
 const userAuth = require('../middlewares/signin.js')
 
 const { Op } = require("sequelize");
+const { NONE } = require('sequelize')
 
 //===================
 //      GET
@@ -253,8 +254,168 @@ GroupRouter.get('/new-task/:title', userAuth.signinAuthLogged,(req, res) => {
     })
 })
 
-GroupRouter.get('/statistics', userAuth.signinAuthLogged, (req, res) => {
-    res.render('pages/statistics')
+GroupRouter.get('/statistics/:title', userAuth.signinAuthLogged, (req, res) => {
+    // https://stackoverflow.com/questions/1484506/random-color-generator
+    function rainbow(numOfSteps, step) {
+        // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
+        // Adam Cole, 2011-Sept-14
+        // HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+        var r, g, b;
+        var h = step / numOfSteps;
+        var i = ~~(h * 6);
+        var f = h * 6 - i;
+        var q = 1 - f;
+        switch(i % 6){
+            case 0: r = 1; g = f; b = 0; break;
+            case 1: r = q; g = 1; b = 0; break;
+            case 2: r = 0; g = 1; b = f; break;
+            case 3: r = 0; g = q; b = 1; break;
+            case 4: r = f; g = 0; b = 1; break;
+            case 5: r = 1; g = 0; b = q; break;
+        }
+        var c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
+        return (c);
+    }
+
+    const uri_title = req.params.title
+    const title = decodeURIComponent(uri_title).replaceAll('-', ' ')
+
+    const task_level = req.session.task_level != undefined ? req.session.task_level : 'not_selected'
+    delete req.session.task_level
+
+    if(task_level == 'not_selected')
+    {
+        delete req.session.task_id
+        delete req.session.filter_id
+    }
+
+    Group.findOne({
+        where: {
+            title: title
+        },
+    }).then(result=>{
+        if(task_level == 'not_selected')
+        {
+            req.session.current_group_id = result.id
+            req.session.current_title = uri_title
+
+            Task.findAll({
+                where:{
+                    GroupId: result.id
+                },
+            }).then(task_result=>{
+                res.render(
+                    'pages/statistics',
+                {
+                    tasks: task_result,
+                    task_level: task_level
+                })
+                return
+            }).catch(error=>{
+                console.log('[ERROR] Task Statistics Error')
+                console.log(error)
+                return
+            })
+        }
+        else if(task_level == 'filters')
+        {
+            FilterTask.findAll({
+                where: {
+                    TaskId: req.session.task_id
+                },
+            }).then(results=>{
+                counter = 0
+                filter_info = []
+                results.forEach(result=>{
+                    Filter.findOne({
+                        where: {
+                            id: result.FilterId
+                        }
+                    }).then(filter_result=>{
+                        filter_info.push(filter_result)
+                        counter += 1
+                        if(counter >= results.length)
+                        {
+                            res.render(
+                                'pages/statistics',
+                            {
+                                task_level: task_level,
+                                filters: filter_info
+                            })
+                        }
+                    }).catch(error=>{
+                        console.log('[ERROR] Filter Error')
+                        console.log(error)
+                        return
+                    })
+                })
+            }).catch(error=>{
+                console.log('[ERROR] Statistics Filter.')
+                console.log(error)
+                return
+            })
+        }
+        else if(task_level == 'data')
+        {
+            UserFilter.findAll({
+                where:{
+                    FilterId: req.session.filter_id,
+                    TaskId: req.session.task_id
+                }
+            }).then(answers=>{
+                delete req.session.task_id
+                delete req.session.filter_id
+                
+                type = answers[0].type
+
+                answers_data = {}
+                answers_color = {}
+                counter = 0
+                answers.forEach(answer=>{
+                    if(!(answer.answer in answers_data))
+                    {
+                        counter += 1
+                        answers_data[answer.answer] = 1
+                        answers_color[answer.answer] = rainbow(answers.length, counter)
+                    }
+                    else
+                    {
+                        answers_data[answer.answer] += 1
+                    }
+                })
+
+                values = Object.values(answers_data)
+                if(typeof values != 'object')
+                    values = [values]
+
+                keys = Object.keys(answers_data)
+                if(typeof values != 'object')
+                    keys = [keys]
+
+                colors = Object.values(answers_color)
+                if(typeof values != 'object')
+                    colors = [colors]
+
+                res.render(
+                    'pages/statistics',
+                {
+                    task_level: task_level,
+                    answers_values: values,
+                    answers_keys: keys,
+                    answers_color: colors,
+                    type: type
+                })
+            }).catch(error=>{
+                console.log('[ERROR] Get Filter Answers')
+                console.log(error)
+                return
+            })
+        }
+    }).catch(error=>{
+        console.log('[ERROR] Group Search Error')
+        console.log(error)
+        return
+    })
 })
 
 GroupRouter.get('/task/:title/:task_id', userAuth.signinAuthLogged, (req, res) => {
@@ -684,6 +845,24 @@ GroupRouter.post('/create-task', userAuth.signinAuthLogged, (req, res) => {
             return
         })
     })
+})
+
+GroupRouter.post('/get-task', userAuth.signinAuthLogged, (req, res) => {
+    req.session.task_level = req.body.process
+    if(req.session.task_level == 'not_selected')
+    {
+        req.session.task_level = "filters"
+        req.session.task_id = parseInt(req.body.task)
+        res.redirect('/statistics/'+req.session.current_title)
+        return
+    }
+    else if(req.session.task_level == 'filters')
+    {
+        req.session.task_level = 'data'
+        req.session.filter_id = parseInt(req.body.filter)
+        res.redirect('/statistics/'+req.session.current_title)
+        return
+    }
 })
 
 module.exports = GroupRouter
