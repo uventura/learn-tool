@@ -21,6 +21,7 @@
     <a href="/new-filter/<%=encode_title%>" class="btn btn-dark">New Filter <i class="fa-solid fa-filter"></i></a>
     <a href="/statistics/<%=encode_title%>" class="btn btn-secondary">Statistics <i class="fa-solid fa-chart-simple"></i></a>
   <%}%>
+  <%if(!canJoin){%>
   <div class="list-group" style="margin-top: 1rem;">
     <%if(tasks_todo.length != 0){%>
       <%tasks_todo.forEach(task=>{%>
@@ -30,6 +31,7 @@
       <h1>No Tasks to do</h1>
     <%}%>
   </div>
+  <%}%>
 </div>
 <br>
 <%-include('../partials/footer.ejs')%>
