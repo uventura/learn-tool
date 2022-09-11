@@ -10,14 +10,30 @@
     }
 
     .chart-container-circle {
-        position: relative;
+        margin:auto;
         height: 30vh;
         width: 30vw;
     }
+
     .chart-container-line {
-        position: relative;
-        height: 50vh;
-        width: 50vw;
+        margin: auto;
+        height: 60vh;
+        width: 60vw;
+    }
+
+    @media (max-width: 750px)
+    {
+        .chart-container-circle {
+            margin: 0;
+            height: 80vh;
+            width: 80vw;
+        }
+
+        .chart-container-line {
+            margin: 0;
+            height: 90vh;
+            width: 90vw;
+        }
     }
 </style>
 
@@ -54,9 +70,9 @@
                 }
             %>
             <%if(type != 'string'){%>
-            <div class="<%=css_class%>">
-                <canvas id="myChart"></canvas>
-            </div>
+                <div class="<%=css_class%>">
+                    <canvas id="myChart"></canvas>
+                </div>
             <%}else{%>
                 <h1>Not Implemented Yet</h1>
             <%}%>

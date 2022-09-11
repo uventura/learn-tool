@@ -29,7 +29,6 @@ SearchRouter.get('/search', userAuth.signinAuthLogged, (req, res) => {
         query += "OR title LIKE '%"+word.toLowerCase()+"%' "
         query += "OR title LIKE '%"+word.charAt(0).toUpperCase()+word.slice(1)+"%' "
 
-        console.log(query)
         if(wordCounter < searchSubject.length)
             query += 'OR '
         wordCounter+=1
@@ -38,8 +37,9 @@ SearchRouter.get('/search', userAuth.signinAuthLogged, (req, res) => {
     console.log(query)
 
     connection.query(query, {raw:true, type:QueryTypes.SELECT}).then(result=>{
-        console.log(result)
-        res.render('pages/search')
+        res.render('pages/search', {
+            groups: result
+        })
     }).catch(error=>{
         console.log('[ERROR] Search Error.')
         console.log(error)
