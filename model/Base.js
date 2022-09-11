@@ -1,2 +1,2 @@
-reset = false
+reset = true
 module.exports = reset
