@@ -503,8 +503,8 @@ GroupRouter.post('/new-group-create', userAuth.signinAuthLogged, (req, res) => {
 
     const title = req.body.title.trim()
     const description = req.body.description
-    const password1 = req.body.passwordOne
-    const password2 = req.body.passwordTwo
+    const password1 = ""
+    const password2 = ""
 
     const creator_id = req.session.userLogged['id']
 
@@ -512,8 +512,8 @@ GroupRouter.post('/new-group-create', userAuth.signinAuthLogged, (req, res) => {
         title: title,
         description: description,
         creator_id: creator_id,
-        passwordOne: password1,
-        passwordTwo: password2
+        passwordOne: "",
+        passwordTwo: ""
     }
 
     req.session.createGroupDataError = groupData
