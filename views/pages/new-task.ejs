@@ -27,7 +27,14 @@
             <button class="btn btn-primary btn-block">
                 Create New Task
             </button>
-            <br><br>
+            <br>
+            <%if(taskError != ''){%>
+            <div class="alert alert-danger" role="alert" style="margin-top: 1rem;">
+              <%=taskError%>
+            </div>              
+            <%}else{%>
+            <br>
+            <%}%>
             <a href="../group/<%=back_uri_title%>">Back</a>
             <br>
           </form>
@@ -35,7 +42,5 @@
       </div>
     </div>
   </div>
-
-  <h1><%=taskError%></h1>
 
 <%-include('../partials/footer.ejs')%>

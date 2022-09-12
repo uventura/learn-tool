@@ -7,7 +7,7 @@
     .replaceAll(space, '-')
 %>
 
-<div class="container" style="margin-top:1.5rem;width: 50rem;">
+<div class="container col-md-6" style="margin-top:1.5rem;">
   <h1 style="margin-bottom: 1rem;"><%=title%></h1>
   <%if(canJoin){%>
     <form action="/join" method="POST" style="display: inline-flex;">
@@ -28,7 +28,9 @@
         <a href="/task/<%=encode_title%>/<%=task.id+42%>" class="list-group-item list-group-item-action"><%=task.title%></a>
       <%})%>
     <%}else{%>
-      <h1>No Tasks to do</h1>
+      <div class="alert alert-primary" role="alert">
+        No tasks to do
+      </div>      
     <%}%>
   </div>
   <%}%>

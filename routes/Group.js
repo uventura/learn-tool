@@ -521,22 +521,34 @@ GroupRouter.post('/new-group-create', userAuth.signinAuthLogged, (req, res) => {
     // NOT EMPTY FIELDS
     if( title.length < 5)
     {
-        req.session.newGroupError = "Title Must Have 5 Characters"
+        req.session.newGroupError = "Title Must Have At Least 5 Characters"
         res.redirect('/new-group')
         return
     }
 
     // GROUP ERROR
     const titleRE = new RegExp('[^a-zA-Z 0-9]')
-    const descriptionRE = new RegExp('[^a-zA-Z 0-9]')
+    const descriptionRE = new RegExp('[^a-zA-Z 0-9ãçéêáàóôèúùûíìõ()]')
     const passwordRE = new RegExp('[^a-zA-Z0-9]')
 
-    if( titleRE.exec(title)!=null
-    || descriptionRE.exec(description)!=null
-    || passwordRE.exec(password1)!=null
+    if(titleRE.exec(title)!=null)
+    {
+        req.session.newGroupError = "Wrong Title, use only space, letters or numbers"
+        res.redirect('/new-group')
+        return
+    }
+
+    if(descriptionRE.exec(description)!=null)
+    {
+        req.session.newGroupError = "Wrong Description"
+        res.redirect('/new-group')
+        return
+    }
+
+    if(passwordRE.exec(password1)!=null
     || passwordRE.exec(password2)!=null)
     {
-        req.session.newGroupError = "Some of the fields has an incorrect symbol."
+        req.session.newGroupError = "Wrong Password"
         res.redirect('/new-group')
         return
     }
@@ -695,7 +707,7 @@ GroupRouter.post('/create-filter', userAuth.signinAuthLogged, (req, res) => {
 
     if(settingRE.exec(setting) != null)
     {
-        req.session.newFilterError = "Setting Cannot Wit Wrong Values"
+        req.session.newFilterError = "Setting Cannot With Wrong Values"
         req.session.filterData = filter_data
         res.redirect('/new-filter/'+groupURI)
         return
@@ -736,7 +748,7 @@ GroupRouter.post('/new-task-create', userAuth.signinAuthLogged, (req, res) => {
 
     if(filters == undefined)
     {
-        req.session.newTaskError = "You must create filters."
+        req.session.newTaskError = "You must use filters."
         res.redirect('/new-task/'+groupTitle)
         return
     }

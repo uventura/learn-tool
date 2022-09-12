@@ -24,6 +24,11 @@
           class="form-control" name="passwordTwo"
           value="<%=newUserData.passwordTwo%>">
           <br>
+          <%if(signupError){%>
+            <div class="alert alert-danger" role="alert">
+              <%=signupError%>
+            </div>
+          <%}%>
           <button class="btn btn-primary btn-lg btn-block">
             Sign up
           </button>
@@ -34,9 +39,5 @@
     </div>
   </div>
 </div>
-
-<%if(signupError){%>
-  <h1><%=signupError%></h1>
-<%}%>
 
 <%-include('../partials/footer.ejs')%>

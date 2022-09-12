@@ -12,7 +12,18 @@ const userAuth = require('../middlewares/signin.js')
 //===================
 
 UserRouter.get('/signin', userAuth.signinAuthNotLogged, (req, res) => {
-    res.render('pages/signin')
+    const signinError = req.session.userLoggedError != undefined ? req.session.userLoggedError : false
+    const error = signinError ? signinError.error : false
+    const email = signinError ? signinError.email : ""
+    const password = signinError ? signinError.password : ""
+
+    delete req.session.userLoggedError
+
+    res.render('pages/signin',{
+        error: error,
+        email: email,
+        password: password
+    })
 })
 
 UserRouter.get('/signup', userAuth.signinAuthNotLogged,(req, res) => {
@@ -58,7 +69,6 @@ UserRouter.post('/user/auth', userAuth.signinAuthNotLogged,(req, res)=>{
     }).then((user)=>{
         if(user != undefined){
             const passwordIsEqual = bcrypt.compareSync(password, user.password)
-            console.log(passwordIsEqual)
 
             if(passwordIsEqual){
                 req.session.userLogged = {
@@ -74,6 +84,11 @@ UserRouter.post('/user/auth', userAuth.signinAuthNotLogged,(req, res)=>{
         }
         else
         {
+            req.session.userLoggedError = {
+                email: email,
+                password: password,
+                error: "Authentication Error"
+            }
             res.redirect('/signin')
         }
     }).catch((error)=>{
@@ -85,8 +100,8 @@ UserRouter.post('/user/auth', userAuth.signinAuthNotLogged,(req, res)=>{
 UserRouter.post('/signup-creation', userAuth.signinAuthNotLogged,(req,res)=>{
     // All steps bellow can be abstracted with external functions
 
-    const name = req.body.name
-    const email = req.body.email
+    const name = req.body.name.trim()
+    const email = req.body.email.trim()
     const password1 = req.body.passwordOne
     const password2 = req.body.passwordTwo
 
@@ -101,13 +116,13 @@ UserRouter.post('/signup-creation', userAuth.signinAuthNotLogged,(req,res)=>{
 
     // SIGN UP ERROR
     const nameRE = new RegExp('[^a-zA-Z ]')
-    const passwordRE = new RegExp('[^a-zA-Z0-9]')
+    const passwordRE = new RegExp('[^a-zA-Z0-9]#$%!')
 
     if( nameRE.exec(name)!=null
     || passwordRE.exec(password1)!=null
     || passwordRE.exec(password2)!=null)
     {
-        req.session.signupError = "Some of the fields has an incorrect symbol."
+        req.session.signupError = "Some of the fields have an incorrect symbol."
         res.redirect('/signup')
         return
     }

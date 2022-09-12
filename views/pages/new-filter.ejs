@@ -34,6 +34,11 @@
                 <input type="text" class="form-control" name="setting" placeholder="Type Here" value="">
                 <br>
             </div>
+            <%if(filter_error != ''){%>
+            <div class="alert alert-danger" role="alert">
+              <%=filter_error%>
+            </div>            
+            <%}%>
             <button class="btn btn-primary btn-block">
                 Create Filter
             </button>
@@ -42,10 +47,6 @@
       </div>
     </div>
   </div>
-
-  <h1>
-    <%=filter_error%>
-  </h1>
 
   <script>
     function showSettings()

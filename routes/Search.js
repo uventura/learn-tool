@@ -21,7 +21,7 @@ SearchRouter.get('/search', userAuth.signinAuthLogged, (req, res) => {
 
     searchSubject = search.split(' ')
 
-    let query = 'SELECT title FROM "Groups" WHERE '
+    let query = 'SELECT title,description FROM "Groups" WHERE '
 
     let wordCounter = 1
     searchSubject.forEach(word=>{

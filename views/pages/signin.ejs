@@ -8,10 +8,15 @@
             <h2 class="card-title">Sign In</h2>
             <br>
             <form action="/user/auth" method="POST">
-              <input type="email" placeholder="Email" class="form-control" name="email">
+              <input type="email" placeholder="Email" class="form-control" name="email" value="<%=email%>">
               <br>
-              <input type="password" placeholder="Password" class="form-control" name="password">
+              <input type="password" placeholder="Password" class="form-control" name="password" value="<%=password%>">
               <br>
+              <%if(error){%>
+                <div class="alert alert-danger" role="alert">
+                  <%=error%>
+                </div>
+              <%}%>
               <button class="btn btn-primary btn-lg btn-block">
                 Sign in
               </button>
