@@ -25,14 +25,15 @@ GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
     const uri_title = req.params.title
     const title = decodeURIComponent(uri_title).replaceAll('-', ' ')
 
-    UserGroup.findOne({
+    UserGroup.findAll({
         where: {
             UserId: req.session.userLogged.id
         }
     }).then(result => {
-        let canJoin = true
-        if(result != null)
-            canJoin = false
+        ids = []
+        result.forEach(group_result=>{
+            ids.push(group_result.GroupId)
+        })
 
         Group.findOne({
             where: {
@@ -41,6 +42,12 @@ GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
             raw:true,
             attributes:['id', 'UserId','title'],
         }).then(group => {
+            let canJoin = true
+            if(ids.includes(group.id) || group.id == ids)
+            {
+                canJoin = false
+            }
+                
             Task.findAll({
                 where: {
                     GroupId: group.id
@@ -61,9 +68,8 @@ GroupRouter.get('/group/:title', userAuth.signinAuthLogged, (req, res) => {
                     }).then(result => {
                         space = encodeURIComponent(' ')
                         encode_title = encodeURIComponent(task.title)
-                        .replaceAll(space, '-')
-            
-                        
+                        .replaceAll(space, '-')           
+                        console.log(result)
                         if(result.length == 0)
                         {
                             tasks_undo.push({
@@ -618,7 +624,8 @@ GroupRouter.post('/join', userAuth.signinAuthLogged, (req, res) => {
 
     UserGroup.findOne({
         where: {
-            UserId: req.session.userLogged.id
+            UserId: req.session.userLogged.id,
+            GroupId: parseInt(groupId)
         }
     }).then(groupRelation => {
         if(groupRelation != null)
